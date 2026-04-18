@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qual é o Melhor Filme da Marvel?</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =============================================
+       VARIÁVEIS CSS — cores e fontes centralizadas
+       ============================================= */
+      :root {
+        --vermelho: #e63946;
+        --dourado: #ffd60a;
+        --escuro: #0d0d0d;
+        --cinza-card: #1a1a2e;
+        --cinza-borda: #2e2e4a;
+        --branco: #f1f1f1;
+        --fonte-titulo: "Bebas Neue", sans-serif;
+        --fonte-corpo: "Barlow", sans-serif;
+      }
+
+      /* =============================================
+       RESET BÁSICO
+       ============================================= */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* =============================================
+       BODY — fundo escuro com textura sutil
+       ============================================= */
+      body {
+        background-color: var(--escuro);
+        background-image:
+          radial-gradient(circle at 20% 30%, #1a0a0a 0%, transparent 60%),
+          radial-gradient(circle at 80% 70%, #0a0a1a 0%, transparent 60%);
+        color: var(--branco);
+        font-family: var(--fonte-corpo);
+        min-height: 100vh;
+        padding: 40px 20px 60px;
+      }
+
+      /* =============================================
+       CABEÇALHO
+       ============================================= */
+      header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      header .logo {
+        display: inline-block;
+        background-color: var(--vermelho);
+        color: white;
+        font-family: var(--fonte-titulo);
+        font-size: 1.2rem;
+        letter-spacing: 4px;
+        padding: 6px 20px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+      }
+
+      header h1 {
+        font-family: var(--fonte-titulo);
+        font-size: clamp(2.5rem, 6vw, 5rem); /* tamanho responsivo */
+        letter-spacing: 3px;
+        line-height: 1.1;
+        color: var(--branco);
+      }
+
+      header h1 span {
+        color: var(--vermelho);
+      }
+
+      header p {
+        margin-top: 14px;
+        font-size: 1rem;
+        color: #aaa;
+        letter-spacing: 1px;
+      }
+
+      /* =============================================
+       GRADE DE CARDS
+       ============================================= */
+      .grade {
+        display: grid;
+        /* cria colunas automáticas de no mínimo 240px */
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+        max-width: 1100px;
+        margin: 0 auto 50px;
+      }
+
+      /* =============================================
+       CARD INDIVIDUAL
+       ============================================= */
+      .card {
+        background-color: var(--cinza-card);
+        border: 1px solid var(--cinza-borda);
+        border-radius: 12px;
+        overflow: hidden;
+        /* transição suave para o hover */
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+        cursor: pointer;
+      }
+
+      /* Efeito ao passar o mouse */
+      .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--vermelho);
+        box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3);
+      }
+
+      /* Estado votado — destaque dourado */
+      .card.votado {
+        border-color: var(--dourado);
+        box-shadow: 0 0 20px rgba(255, 214, 10, 0.4);
+      }
+
+      /* Emoji grande do filme */
+      .card .emoji {
+        font-size: 5rem;
+        text-align: center;
+        padding: 28px 0 10px;
+        display: block;
+        /* animação de entrada ao carregar */
+        animation: surgir 0.5s ease backwards;
+      }
+
+      .card .info {
+        padding: 16px 20px 20px;
+      }
+
+      .card .titulo {
+        font-family: var(--fonte-titulo);
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+        color: var(--branco);
+      }
+
+      .card .ano {
+        font-size: 0.8rem;
+        color: var(--branco);
+        margin-bottom: 12px;
+      }
+
+      /* =============================================
+       BARRA DE PROGRESSO DE VOTOS
+       ============================================= */
+      .barra-container {
+        background-color: #333;
+        border-radius: 999px;
+        height: 8px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+
+      .barra-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--vermelho), var(--dourado));
+        border-radius: 999px;
+        /* transição suave quando o valor muda */
+        transition: width 0.6s ease;
+        width: 0%; /* começa em 0, JS vai mudar */
+      }
+
+      .votos-texto {
+        font-size: 0.8rem;
+        color: #bbb;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* =============================================
+       BOTÃO DE VOTO
+       ============================================= */
+      .btn-votar {
+        width: 100%;
+        margin-top: 14px;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background-color: var(--vermelho);
+        color: white;
+        font-family: var(--fonte-titulo);
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          transform 0.1s ease;
+      }
+
+      .btn-votar:hover {
+        background-color: #c1121f;
+      }
+
+      .btn-votar:active {
+        transform: scale(0.97);
+      }
+
+      /* Botão quando já votado nesse card */
+      .btn-votar.votado {
+        background-color: var(--dourado);
+        color: #111;
+      }
+
+      /* =============================================
+       SEÇÃO DE RESULTADO
+       ============================================= */
+      .resultado {
+        max-width: 600px;
+        margin: 0 auto 30px;
+        text-align: center;
+        background-color: var(--cinza-card);
+        border: 1px solid var(--cinza-borda);
+        border-radius: 12px;
+        padding: 30px;
+        /* começa escondido */
+        display: none;
+      }
+
+      .resultado.visivel {
+        display: block;
+        animation: surgir 0.5s ease;
+      }
+
+      .resultado h2 {
+        font-family: var(--fonte-titulo);
+        font-size: 2rem;
+        color: var(--dourado);
+        margin-bottom: 10px;
+      }
+
+      .resultado .vencedor-nome {
+        font-family: var(--fonte-titulo);
+        font-size: 3rem;
+        color: var(--branco);
+      }
+
+      .resultado .vencedor-votos {
+        margin-top: 8px;
+        color: #aaa;
+        font-size: 0.95rem;
+      }
+
+      /* Botão resetar votos */
+      .btn-resetar {
+        margin-top: 20px;
+        padding: 10px 30px;
+        border: 2px solid var(--cinza-borda);
+        background: transparent;
+        color: var(--branco);
+        font-family: var(--fonte-titulo);
+        font-size: 1rem;
+        letter-spacing: 2px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+
+      .btn-resetar:hover {
+        border-color: var(--vermelho);
+        color: var(--vermelho);
+      }
+
+      /* =============================================
+       ANIMAÇÃO DE ENTRADA
+       ============================================= */
+      @keyframes surgir {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Atraso progressivo para os cards aparecerem em sequência */
+      .card:nth-child(1) {
+        animation: surgir 0.5s ease 0.05s backwards;
+      }
+      .card:nth-child(2) {
+        animation: surgir 0.5s ease 0.1s backwards;
+      }
+      .card:nth-child(3) {
+        animation: surgir 0.5s ease 0.15s backwards;
+      }
+      .card:nth-child(4) {
+        animation: surgir 0.5s ease 0.2s backwards;
+      }
+      .card:nth-child(5) {
+        animation: surgir 0.5s ease 0.25s backwards;
+      }
+      .card:nth-child(6) {
+        animation: surgir 0.5s ease 0.3s backwards;
+      }
+
+      /* =============================================
+       RODAPÉ
+       ============================================= */
+      footer {
+        text-align: center;
+        color: #555;
+        font-size: 0.8rem;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ===== CABEÇALHO ===== -->
+    <header>
+      <div class="logo">MARVEL STUDIOS</div>
+      <h1>Qual é o <span>Melhor</span><br />Filme da Marvel?</h1>
+      <p>Vote no seu favorito e veja o resultado em tempo real</p>
+    </header>
+
+    <!-- ===== GRADE DE FILMES (gerada pelo JS) ===== -->
+    <div class="grade" id="grade"></div>
+
+    <!-- ===== ÁREA DE RESULTADO ===== -->
+    <div class="resultado" id="resultado">
+      <h2>🏆 Favorito do Momento</h2>
+      <div class="vencedor-nome" id="vencedor-nome"></div>
+      <div class="vencedor-votos" id="vencedor-votos"></div>
+      <button class="btn-resetar" onclick="resetarVotos()">
+        Resetar Votos
+      </button>
+    </div>
+
+    <!-- ===== RODAPÉ ===== -->
+    <footer>
+      <p>Projeto de estudo — HTML, CSS e JavaScript</p>
+    </footer>
+
+    <!-- ===================================================
+       JAVASCRIPT
+       ================================================== -->
+    <script>
+      // -----------------------------------------------
+      // 1. DADOS — lista de filmes
+      // Cada objeto tem: id, emoji, titulo, ano e votos
+      // -----------------------------------------------
+      const filmes = [
+        {
+          id: 1,
+          emoji: "🕷️",
+          titulo: "Homem-Aranha",
+          ano: "No Aranhaverso — 2021",
+          votos: 0,
+        },
+        {
+          id: 2,
+          emoji: "🦾",
+          titulo: "Homem de Ferro",
+          ano: "Iron Man — 2008",
+          votos: 0,
+        },
+        {
+          id: 3,
+          emoji: "🛡️",
+          titulo: "Vingadores",
+          ano: "Endgame — 2019",
+          votos: 0,
+        },
+        {
+          id: 4,
+          emoji: "⚡",
+          titulo: "Thor",
+          ano: "Ragnarok — 2017",
+          votos: 0,
+        },
+        {
+          id: 5,
+          emoji: "🐾",
+          titulo: "Pantera Negra",
+          ano: "Black Panther — 2018",
+          votos: 0,
+        },
+        {
+          id: 6,
+          emoji: "🌌",
+          titulo: "Guardiões",
+          ano: "Vol. 2 — 2017",
+          votos: 0,
+        },
+        {
+          id: 7,
+          emoji: "🧙‍♂️",
+          titulo: "Doutor Estranho",
+          ano: "Multiverso da Loucura — 2022",
+          votos: 0,
+        },
+        {
+          id: 8,
+          emoji: " 🌟 ",
+          titulo: "Capitã Marvel",
+          ano: "Captain Marvel — 2019",
+          votos: 0,
+        },
+      ];
+
+      // Guarda qual ID o usuário votou (null = ainda não votou)
+      let idVotado = null;
+
+      // -----------------------------------------------
+      // 2. FUNÇÃO: calcular total de votos
+      // -----------------------------------------------
+      function totalVotos() {
+        // reduce: percorre o array somando todos os votos
+        return filmes.reduce((soma, f) => soma + f.votos, 0);
+      }
+
+      // -----------------------------------------------
+      // 3. FUNÇÃO: calcular porcentagem de um filme
+      // -----------------------------------------------
+      function porcentagem(votos) {
+        const total = totalVotos();
+        if (total === 0) return 0;
+        // Math.round arredonda para inteiro
+        return Math.round((votos / total) * 100);
+      }
+
+      // -----------------------------------------------
+      // 4. FUNÇÃO: renderizar (desenhar) os cards na tela
+      // -----------------------------------------------
+      function renderizar() {
+        const grade = document.getElementById("grade");
+
+        // Limpa o conteúdo anterior
+        grade.innerHTML = "";
+
+        // Para cada filme, cria um card HTML
+        filmes.forEach(function (filme) {
+          const esteEstaVotado = idVotado === filme.id;
+          const percent = porcentagem(filme.votos);
+
+          // Template string — monta o HTML do card
+          const cardHTML = `
+          <div class="card ${esteEstaVotado ? "votado" : ""}" id="card-${filme.id}">
+
+            <span class="emoji">${filme.emoji}</span>
+
+            <div class="info">
+              <div class="titulo">${filme.titulo}</div>
+              <div class="ano">${filme.ano}</div>
+
+              <!-- Barra de progresso -->
+              <div class="barra-container">
+                <div class="barra-fill" id="barra-${filme.id}" style="width: ${percent}%"></div>
+              </div>
+
+              <!-- Texto de votos e porcentagem -->
+              <div class="votos-texto">
+                <span>${filme.votos} voto${filme.votos !== 1 ? "s" : ""}</span>
+                <span>${percent}%</span>
+              </div>
+
+              <!-- Botão de votar -->
+              <button
+                class="btn-votar ${esteEstaVotado ? "votado" : ""}"
+                onclick="votar(${filme.id})"
+                ${idVotado !== null && !esteEstaVotado ? "disabled" : ""}
+              >
+                ${esteEstaVotado ? "✔ VOTADO" : "VOTAR"}
+              </button>
+            </div>
+
+          </div>
+        `;
+
+          // Insere o card no final da grade
+          grade.innerHTML += cardHTML;
+        });
+
+        // Após renderizar, atualiza o resultado
+        atualizarResultado();
+      }
+
+      // -----------------------------------------------
+      // 5. FUNÇÃO: registrar um voto
+      // -----------------------------------------------
+      function votar(id) {
+        // Bloqueia se já votou
+        if (idVotado !== null) return;
+
+        // Encontra o filme pelo id usando find()
+        const filme = filmes.find(function (f) {
+          return f.id === id;
+        });
+
+        // Incrementa os votos
+        filme.votos++;
+
+        // Salva qual foi votado
+        idVotado = id;
+
+        // Redesenha tudo
+        renderizar();
+      }
+
+      // -----------------------------------------------
+      // 6. FUNÇÃO: mostrar o vencedor
+      // -----------------------------------------------
+      function atualizarResultado() {
+        const resultado = document.getElementById("resultado");
+
+        // Só mostra se pelo menos 1 voto foi registrado
+        if (totalVotos() === 0) {
+          resultado.classList.remove("visivel");
+          return;
+        }
+
+        // Encontra o filme com mais votos
+        // sort() ordena do maior para o menor; [0] pega o primeiro
+        const vencedor = [...filmes].sort(function (a, b) {
+          return b.votos - a.votos;
+        })[0];
+
+        document.getElementById("vencedor-nome").textContent =
+          vencedor.emoji + " " + vencedor.titulo;
+
+        document.getElementById("vencedor-votos").textContent =
+          vencedor.votos +
+          " voto(s) — " +
+          porcentagem(vencedor.votos) +
+          "% do total";
+
+        resultado.classList.add("visivel");
+      }
+
+      // -----------------------------------------------
+      // 7. FUNÇÃO: resetar todos os votos
+      // -----------------------------------------------
+      function resetarVotos() {
+        // Percorre todos os filmes e zera os votos
+        filmes.forEach(function (f) {
+          f.votos = 0;
+        });
+
+        // Reseta o voto do usuário
+        idVotado = null;
+
+        // Redesenha
+        renderizar();
+      }
+
+      // -----------------------------------------------
+      // 8. INICIAR — chama renderizar() ao abrir a página
+      // -----------------------------------------------
+      renderizar();
+    </script>
+  </body>
+</html>
